@@ -20,14 +20,11 @@ const gameSchema = mongoose.model('gameSchema');
 require('./models/conditions');
 const conditionSchema = mongoose.model('conditionSchema');
 
-// array of game IDs
-require('./models/gameIDs');
-const gameArrSchema = mongoose.model('gameArrSchema');
-
-/********* Schemas ***********/
+require('./models/gameIds');
+const gameIdSchema = mongoose.model('gameIdSchema');
 
 // array of game IDs
-var gameArr = ["480610", "502734", "490429"];
+var gameArr = ["480610", "502734", "490429", "502729", "490430", "502728", "480611", "499888", "487025"];
 
 // connect to mLab
 mongoose.connect(keys.mongoURI);
@@ -69,6 +66,12 @@ app.get('/completed', (req, res) => {
     })
 })
 
+app.get('/all', (req, res) => {
+    gameSchema.find({}).then((games) => {
+        res.send(games)
+    })
+})
+
 // delete conditions for games that have COMPLETED
 app.get('/cleanConditions', (req,res) => {
     gameSchema.find({active: "COMPLETED"}).then((games) => {
@@ -90,12 +93,25 @@ app.get('/cleanConditions', (req,res) => {
 });
 
 setInterval(function(){
-    gameArr.forEach((g) => {
-        funcs.getGame(g)
+    gameIdSchema.find({active: false}).then((game_ids) => {
+        game_ids.forEach((g) => {
+            funcs.getGame(g)
+        })
     })
 }, 2 * 60 * 1000)
 
 /********* POST ***********/
+
+app.post('/addGames', (req,res) => {
+    var gameIds = req.body.game_ids
+    gameIds.forEach((game_id) => {
+        var g = new gameIdSchema({
+            game_id,
+            active: true
+        })
+        g.save()
+    })
+})
 
 // save conditions to db
 app.post('/condition', (req,res) => {
@@ -111,28 +127,6 @@ app.post('/condition', (req,res) => {
     res.send(req.body);
 });
 
-// save new gameID to db
-// TODO: Only save id if it isn't already in db
-// TODO: read, update?, delete
-app.post('/gameIDs', (req,res) => {
-
-	gameArrSchema.findOne()
-
-		.then((gameArr) => {
-			for(var i = 0; i < req.body.game_ids.length; i++){
-
-				gameArr.game_ids.push(req.body.game_ids[i]);
-			}
-
-			gameArr.save();
-			res.send(gameArr.game_ids);
-		})
-		.catch((e) => {
-			console.log(e);
-		});
-
-});
-
 // make call
 // params: number, msg
 // example: /call?number=14088321289&msg=Hello
@@ -143,7 +137,7 @@ app.post('/call', (req,res) => {
     res.send(`Made call to ${number} with message:\n${msg}`);
   });
 })
-
+=======
 // make sms text
 // params: number, msg
 // example: /text?number=14088321289&msg=Hello
