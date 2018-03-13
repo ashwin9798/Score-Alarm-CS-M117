@@ -93,12 +93,12 @@ app.get('/cleanConditions', (req,res) => {
 });
 
 setInterval(function(){
-    gameIdSchema.find({active: false}).then((game_ids) => {
+    gameIdSchema.find({active: true}).then((game_ids) => {
         game_ids.forEach((g) => {
-            funcs.getGame(g)
+            funcs.getGame(g.game_id)
         })
     })
-}, 2 * 60 * 1000)
+}, 1 * 60 * 1000)
 
 /********* POST ***********/
 
@@ -137,7 +137,7 @@ app.post('/call', (req,res) => {
     res.send(`Made call to ${number} with message:\n${msg}`);
   });
 })
-=======
+
 // make sms text
 // params: number, msg
 // example: /text?number=14088321289&msg=Hello
