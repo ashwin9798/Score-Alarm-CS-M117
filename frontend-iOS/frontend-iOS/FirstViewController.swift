@@ -21,6 +21,7 @@ class FirstViewController: UITableViewController {
     
     var chosenTeam1: String = ""
     var chosenTeam2: String = ""
+    var chosenGameID: String = ""
     var chosenCell: Int = 0
     
     func shouldLabelWidthChange(label: UILabel) -> Bool{
@@ -82,25 +83,29 @@ class FirstViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
-        Alamofire.request("https://ec02089b.ngrok.io/future").responseJSON(completionHandler: {
+        Alamofire.request("https://pacific-scrubland-76368.herokuapp.com/future").responseJSON(completionHandler: {
             response in
             if let value = response.result.value {
                 let json = JSON(value) //Don't forget to import SwiftyJSON
                 self.upcomingGames.removeAll()
-                for game_num in 0...json.count-1 {
-                    var team1 = json[game_num]["teams"][0].stringValue
-                    var team2 = json[game_num]["teams"][1].stringValue
+                if(json.count != 0) {
+                    for game_num in 0...json.count-1 {
+                        
+                        var team1 = json[game_num]["teams"][0].stringValue
+                        var team2 = json[game_num]["teams"][1].stringValue
                     
-                    var time = json[game_num]["start_details"].stringValue
+                        var time = json[game_num]["start_details"].stringValue
+                        var game_id = json[game_num]["game_id"].stringValue
                     
-                    let game = Game(team1: team1, team2: team2, date: time)
+                        let game = Game(team1: team1, team2: team2, date: time, game_id: game_id)
                     
-                    let match = [team1, team2]
+                        let match = [team1, team2]
                     
-                    let contains = self.scheduledAlarms.contains(where: { $0.team1 == match[0] && $0.team2 == match[1] })
+                        let contains = self.scheduledAlarms.contains(where: { $0.team1 == match[0] && $0.team2 == match[1] })
                     
-                    if(!contains) {
-                        self.upcomingGames.append(game)
+                        if(!contains) {
+                            self.upcomingGames.append(game)
+                        }
                     }
                 }
                 var defaults = UserDefaults.standard
@@ -222,6 +227,7 @@ class FirstViewController: UITableViewController {
                 
                 cell.parentViewController = self
                 cell.cellIndex = indexPath.row
+                cell.game_id = upcomingGames[indexPath.row-1].game_id
                 return cell
             }
         }
@@ -254,6 +260,7 @@ class FirstViewController: UITableViewController {
         var destVC: CreateAlarmViewController = segue.destination as! CreateAlarmViewController
         destVC.team1 = chosenTeam1
         destVC.team2 = chosenTeam2
+        destVC.game_id = chosenGameID
         destVC.cellIndex = chosenCell
     }
 

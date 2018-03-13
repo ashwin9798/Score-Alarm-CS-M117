@@ -16,6 +16,7 @@ class UpcomingMatchTVCell: UITableViewCell {
     @IBOutlet weak var actionButton: UIButton!
     
     var cellIndex: Int = 0
+    var game_id: String = ""
     
     var parentViewController: FirstViewController!
     
@@ -23,6 +24,7 @@ class UpcomingMatchTVCell: UITableViewCell {
         if let parentVC = self.parentViewController as? FirstViewController {
             parentVC.chosenTeam1 = team1Label.text!
             parentVC.chosenTeam2 = team2Label.text!
+            parentVC.chosenGameID = game_id
             parentVC.chosenCell = cellIndex
             parentVC.performSegue(withIdentifier: "toCreateAlarmVC", sender: self)
         }
