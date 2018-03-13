@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -20,10 +22,13 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
     
     var team1: String = ""
     var team2: String = ""
+    var game_id: String = ""
     var numConditions: Int = 0
     
     var conditionLabels: [UILabel] = []
     var chosenConditions: [String] = ["","","",""]
+    
+    var myConditions: [Condition] = [Condition(), Condition(), Condition(), Condition()]
     
     var cellIndex: Int = 0
     
@@ -31,7 +36,45 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
         
         //TODO: POST to the server
         
+        getData(index: 0, condition: myConditions[0])
+        
         performSegue(withIdentifier: "addAlarm", sender: self)
+    }
+    
+    func getData(index: Int, condition: Condition) {
+        if (index == 4) {
+            return
+        }
+        
+        print(condition.game_id != "")
+        print(chosenConditions[index] != "")
+        
+        if (condition.game_id != "" && chosenConditions[index] != ""){
+                let parameters: Parameters = [
+                    "type": condition.condition_type,
+                    "satisfied": false,
+                    "game_id": condition.game_id,
+                    "time": condition.time_option,
+                    "goals": condition.goal_option,
+                    "team": condition.team
+                ]
+                
+            Alamofire.request("https://pacific-scrubland-76368.herokuapp.com/condition", method: .post, parameters: parameters, encoding: JSONEncoding.default).responseJSON(completionHandler: {
+                response in
+                    if let value = response.result.value {
+                        let json = JSON(value)
+                        print(json)
+                        if(index < 3) {
+                            self.getData(index: index+1, condition: self.myConditions[index+1])
+                        }
+                    }
+            })
+        }
+        else {
+            if(index < 3) {
+                self.getData(index: index+1, condition: self.myConditions[index+1])
+            }
+        }
     }
     
     override func viewDidLoad() {
@@ -84,18 +127,24 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
             let cell = tableView.dequeueReusableCell(withIdentifier: "goalDifference") as! GoalConditionTVCell
             cell.parentViewController = self
             cell.cellIndex = 0
+            cell.teamNames[0] = team1
+            cell.teamNames[1] = team2
             return cell
         }
         else if(indexPath.section == 1) {
             let cell = tableView.dequeueReusableCell(withIdentifier: "goalsScoredTeam1") as! GoalConditionTVCell
             cell.parentViewController = self
             cell.cellIndex = 1
+            cell.teamNames[0] = team1
+            cell.teamNames[1] = team2
             return cell
         }
         else if(indexPath.section == 2) {
             let cell = tableView.dequeueReusableCell(withIdentifier: "goalsScoredTeam2") as! GoalConditionTVCell
             cell.parentViewController = self
             cell.cellIndex = 2
+            cell.teamNames[0] = team1
+            cell.teamNames[1] = team2
             return cell
         }
         else if(indexPath.section == 3) {
@@ -155,12 +204,7 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
         
         var retrievedAlarms = NSKeyedUnarchiver.unarchiveObject(with: decoded1) as! [Alarm]
         
-
-        
-        
-//        var retrievedUpcomingMatches: [Game] = UserDefaults.standard.object(forKey: "upcomingMatches") as! [Game]
-        
-        retrievedAlarms.append(Alarm(team1: team1, team2: team2, numConditions: numConditions))
+        retrievedAlarms.append(Alarm(team1: team1, team2: team2, game_id: game_id, numConditions: numConditions))
 
         
         let decoded2  = UserDefaults.standard.data(forKey: "upcomingMatches") as! Data
@@ -172,15 +216,5 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
         destVC.upcomingGames = retrievedUpcomingMatches
         destVC.tableView.reloadData()
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

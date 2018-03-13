@@ -13,7 +13,7 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
     @IBOutlet weak var isEnabled: UISwitch!
     @IBOutlet weak var goalPicker: UIPickerView!
     @IBOutlet weak var timePicker: UIPickerView!
-    var teamNames: [String] = ["Juventus", "Real Madrid", "Neither"]
+    var teamNames: [String] = ["", "", "Neither"]
     var isTeamCondition: Bool = false
     
     @IBOutlet weak var label1: UIView!
@@ -59,7 +59,7 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                     picker1Val = teamNames[row]
                 }
                 else {
-                    picker1Val = String(row+1)
+                    picker1Val = (row+1)
                 }
             }
             else {
@@ -69,18 +69,22 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
             var templateString = ""
             if(cellIndex == 0) {
                 templateString = "Goal difference of \(picker1Val) at \(picker2Val) minutes"
+                parentViewController.myConditions[0] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 0, time_option: picker2Val, goal_option: picker1Val as! Int)
             }
             else if(cellIndex == 1) {
                 templateString = "\(teamNames[0]) has scored at least \(picker1Val) after \(picker2Val) minutes"
+                 parentViewController.myConditions[1] = Condition(team: 0, game_id: parentViewController.game_id, condition_type: 1, time_option: picker2Val, goal_option: picker1Val as! Int)
             }
             else if(cellIndex == 2) {
                 templateString = "\(teamNames[1]) has scored at least \(picker1Val) after \(picker2Val) minutes"
+                parentViewController.myConditions[2] = Condition(team: 1, game_id: parentViewController.game_id, condition_type: 2, time_option: picker2Val, goal_option: picker1Val as! Int)
             }
             else if(cellIndex == 3) {
                 if(String(describing: picker1Val) == "Neither") {
                     templateString = "The game is drawn at \(picker2Val) minutes"
                 }
                 templateString = "\(picker1Val) is leading at \(picker2Val) minutes"
+                parentViewController.myConditions[3] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 3, time_option: picker2Val, goal_option: -1)
             }
             parentVC.chosenConditions[cellIndex] = templateString
             parentVC.updateLabel(index: cellIndex)
@@ -156,9 +160,13 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
         super.awakeFromNib()
         // Initialization code
         
+        
         isEnabled.addTarget(self, action: #selector(switchChanged), for: UIControlEvents.valueChanged)
         timePicker.delegate = self
         timePicker.dataSource = self
+        
+        timePicker.selectRow(45, inComponent: 0, animated: false)
+        
         
         goalPicker.delegate = self
         goalPicker.dataSource = self
