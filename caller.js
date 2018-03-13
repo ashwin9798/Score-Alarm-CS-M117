@@ -19,4 +19,15 @@ exports.make_call = function(number, message, cb) {
       from: '+14082146770',
     })
     .then(call => cb(call));
-}
+};
+
+exports.make_sms = function(number, message, cb) {
+  cb = cb || function(a){};
+  client.messages
+    .create({
+      messagingServiceSid: 'MGc10a7e860a82bc3f0935929595521075',
+      to: number,
+      body: message
+    })
+    .then(message => cb(message));
+};
