@@ -112,6 +112,7 @@ class FirstViewController: UITableViewController {
                 let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.upcomingGames)
                 defaults.set(encodedData, forKey: "upcomingMatches")
                 defaults.synchronize()
+                
                 self.tableView.reloadData()
             }
         })
@@ -254,6 +255,31 @@ class FirstViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         (view as! UITableViewHeaderFooterView).backgroundView?.backgroundColor = UIColor.clear
+    }
+    
+    private var finishedLoadingInitialTableCells = false
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        //MARK:- Fade transition Animation
+        cell.alpha = 0
+        UIView.animate(withDuration: 0.2 * Double(indexPath.row)) {
+            cell.alpha = 1
+        }
+        
+        //MARK:- Curl transition Animation
+        // cell.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1)
+        
+        // UIView.animate(withDuration: 0.4) {
+        //  cell.layer.transform = CATransform3DIdentity
+        //}
+        
+        //MARK:- Frame Translation Animation
+        //cell.layer.transform = CATransform3DTranslate(CATransform3DIdentity, -cell.frame.width, 1, 1)
+        
+        // UIView.animate(withDuration: 0.33) {
+        //  cell.layer.transform = CATransform3DIdentity
+        // }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

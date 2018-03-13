@@ -116,9 +116,9 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ddY-nt-9JX">
-                                            <rect key="frame" x="7" y="11" width="75" height="78"/>
+                                            <rect key="frame" x="7" y="11" width="78" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="14"/>
+                                            <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="13"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -527,6 +527,7 @@
         <image name="vertical-line.jpg" width="3" height="370"/>
     </resources>
     <inferredMetricsTieBreakers>
+        <segue reference="ECy-FJ-YbJ"/>
         <segue reference="seG-oT-U4R"/>
     </inferredMetricsTieBreakers>
 </document>

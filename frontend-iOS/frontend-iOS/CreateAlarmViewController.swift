@@ -45,6 +45,10 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
         if (index == 4) {
             return
         }
+        
+        print(condition.game_id != "")
+        print(chosenConditions[index] != "")
+        
         if (condition.game_id != "" && chosenConditions[index] != ""){
                 let parameters: Parameters = [
                     "type": condition.condition_type,
@@ -60,12 +64,16 @@ class CreateAlarmViewController: UIViewController, UITableViewDelegate, UITableV
                     if let value = response.result.value {
                         let json = JSON(value)
                         print(json)
-                        self.getData(index: index+1, condition: self.myConditions[index])
+                        if(index < 3) {
+                            self.getData(index: index+1, condition: self.myConditions[index+1])
+                        }
                     }
             })
         }
         else {
-            self.getData(index: index+1, condition: self.myConditions[index])
+            if(index < 3) {
+                self.getData(index: index+1, condition: self.myConditions[index+1])
+            }
         }
     }
     
