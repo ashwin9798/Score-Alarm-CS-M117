@@ -185,9 +185,13 @@ function testCondition(){
 
                                 if((currGoalDiff == desiredGoalDiff)  && (desiredTime == -1 || currTime >= desiredTime)){
                                     alertUser(conditionType, game.teams[0], game.teams[1], desiredGoalDiff, null, null, null, null);
+                                    conditionSchema.update({game_id: condition.game_id}, { $set: { "satisfied": true }}, function(err,condition){
+                                        if (err) console.log(err) ;
+                                        // res.send(condition);
+                                    });
                                 }
                                 else{
-                                    console.log("Condition of Type 1 not satisfied");
+                                    console.log("Condition Type 1 NOT Satisfied", condition);
                                 }
                                 break;
 
@@ -202,9 +206,13 @@ function testCondition(){
 
                                 if(currGoals == desiredGoals && (desiredTime == -1 || currTime >= desiredTime)){
                                     alertUser(conditionType, null, null, null, game.teams[teamIndex], desiredGoals, null, null);
+                                    conditionSchema.update({game_id: condition.game_id}, { $set: { "satisfied": true }}, function(err,condition){
+                                        if (err) console.log(err) ;
+                                        // res.send(condition);
+                                    });                                
                                 }
                                 else{
-                                    console.log("Condition of Type 2 not satisfied");
+                                    console.log("Condition of Type 2 not satisfied", condition);
                                 }
                                 break;
 
@@ -231,6 +239,13 @@ function testCondition(){
                                         gameStatus = 1;
 
                                     alertUser(conditionType, null, null, null, game.teams[teamIndex], null, gameStatus, currTime);                                  
+                                    conditionSchema.update({game_id: condition.game_id}, { $set: { "satisfied": true }}, function(err,condition){
+                                        if (err) console.log(err) ;
+                                        // res.send(condition);
+                                    });
+                                }
+                                else{
+                                    console.log("Condition of Type 3 not satisfied", condition);
                                 }
 
                                 break;
@@ -242,10 +257,8 @@ function testCondition(){
                     })
                     .catch((e) => {
                         console.log(e);
-                    })
-
-
-            })
+                    });
+            });
         })
 
         .catch((e) => {

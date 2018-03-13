@@ -77,7 +77,7 @@ function saveGame(teams, game_id, goals, start_details, game_time, active){
         gameIdSchema.findOneAndUpdate({game_id: game_id}, gid, (err,g) => {
             if (err) console.log(err);
             else {
-                console.log("Game finished, will no longer update:", g);
+                // console.log("Game finished, will no longer update:", g);
             }
         })
     }
@@ -85,7 +85,7 @@ function saveGame(teams, game_id, goals, start_details, game_time, active){
     gameSchema.findOneAndUpdate({game_id: game_id}, game, {upsert: true, new: true}, (err, g) => {
         if (err) console.log(err);
         else {
-            console.log("Game update success:", g);
+            // console.log("Game update success:", g);
         }
     })
 }
