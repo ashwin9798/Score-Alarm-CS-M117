@@ -67,8 +67,11 @@ app.get('/completed', (req, res) => {
 })
 
 app.get('/all', (req, res) => {
-    gameSchema.find({}).then((games) => {
-        res.send(games)
+    gameSchema.find({active: "LIVE"}).then((actives) => {
+        gameSchema.find({active: "FUTURE"}).then((futures) => {
+            var games = actives.concat(futures);
+            res.send(games)
+        })
     })
 })
 
