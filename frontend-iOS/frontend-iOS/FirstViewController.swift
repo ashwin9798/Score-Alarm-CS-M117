@@ -16,8 +16,10 @@ class FirstViewController: UITableViewController {
     
     var upcomingGames: [Game] = []
     var scheduledAlarms: [Alarm] = []
+//    refreshControlUIRefreshControl!
+
     
-    var headerArray: [String] = ["Scheduled Alarms", "Upcoming Matches"]
+    var headerArray: [String] = ["Scheduled Alarms", "All Matches"]
     
     var chosenTeam1: String = ""
     var chosenTeam2: String = ""
@@ -74,16 +76,8 @@ class FirstViewController: UITableViewController {
 //        tableView.reloadData()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        Alamofire.request("https://pacific-scrubland-76368.herokuapp.com/future").responseJSON(completionHandler: {
+    @objc func request_data() {
+        Alamofire.request("https://pacific-scrubland-76368.herokuapp.com/all").responseJSON(completionHandler: {
             response in
             if let value = response.result.value {
                 let json = JSON(value) //Don't forget to import SwiftyJSON
@@ -93,16 +87,23 @@ class FirstViewController: UITableViewController {
                         
                         var team1 = json[game_num]["teams"][0].stringValue
                         var team2 = json[game_num]["teams"][1].stringValue
-                    
+                        
                         var time = json[game_num]["start_details"].stringValue
                         var game_id = json[game_num]["game_id"].stringValue
-                    
-                        let game = Game(team1: team1, team2: team2, date: time, game_id: game_id)
-                    
+                        
+                        var is_live = 0
+                        if(json[game_num]["active"] == "LIVE") {
+                            is_live = 1
+                        }
+                        
+                        var elapsed_time = json[game_num]["game_time"].stringValue
+                        
+                        let game = Game(team1: team1, team2: team2, date: time, game_id: game_id, is_live: is_live, elapsed_time: elapsed_time)
+                        
                         let match = [team1, team2]
-                    
+                        
                         let contains = self.scheduledAlarms.contains(where: { $0.team1 == match[0] && $0.team2 == match[1] })
-                    
+                        
                         if(!contains) {
                             self.upcomingGames.append(game)
                         }
@@ -114,8 +115,68 @@ class FirstViewController: UITableViewController {
                 defaults.synchronize()
                 
                 self.tableView.reloadData()
+                self.refreshControl?.endRefreshing()
             }
         })
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
+
+        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+//        Alamofire.request("https://pacific-scrubland-76368.herokuapp.com/all").responseJSON(completionHandler: {
+//            response in
+//            if let value = response.result.value {
+//                let json = JSON(value) //Don't forget to import SwiftyJSON
+//                self.upcomingGames.removeAll()
+//                if(json.count != 0) {
+//                    for game_num in 0...json.count-1 {
+//
+//                        var team1 = json[game_num]["teams"][0].stringValue
+//                        var team2 = json[game_num]["teams"][1].stringValue
+//
+//                        var time = json[game_num]["start_details"].stringValue
+//                        var game_id = json[game_num]["game_id"].stringValue
+//
+//                        var is_live = 0
+//                        if(json[game_num]["active"] == "LIVE") {
+//                            is_live = 1
+//                        }
+//
+//                        var elapsed_time = json[game_num]["game_time"].stringValue
+//
+//                        let game = Game(team1: team1, team2: team2, date: time, game_id: game_id, is_live: is_live, elapsed_time: elapsed_time)
+//
+//                        let match = [team1, team2]
+//
+//                        let contains = self.scheduledAlarms.contains(where: { $0.team1 == match[0] && $0.team2 == match[1] })
+//
+//                        if(!contains) {
+//                            self.upcomingGames.append(game)
+//                        }
+//                    }
+//                }
+//                var defaults = UserDefaults.standard
+//                let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.upcomingGames)
+//                defaults.set(encodedData, forKey: "upcomingMatches")
+//                defaults.synchronize()
+//
+//                self.tableView.reloadData()
+//            }
+//        })
+        
+        refreshControl = UIRefreshControl()
+        refreshControl?.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl?.addTarget(self, action: #selector(FirstViewController.request_data), for: UIControlEvents.valueChanged)
+        
+        self.request_data()
+        
+        _ = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(request_data), userInfo: nil, repeats: true)
         
         tableView.clipsToBounds=true
         self.tableView.tableFooterView = UIView()
@@ -212,7 +273,12 @@ class FirstViewController: UITableViewController {
                 cell.separatorInset = UIEdgeInsets.zero
                 cell.layoutMargins = UIEdgeInsets.zero
                 
-                cell.timeLabel.text = formatDate(date: upcomingGames[indexPath.row-1].date)
+                if(upcomingGames[indexPath.row-1].is_live == 1) {
+                    cell.timeLabel.text = "LIVE" + "\n" + "\(upcomingGames[indexPath.row-1].elapsed_time)'"
+                }
+                else {
+                    cell.timeLabel.text = formatDate(date: upcomingGames[indexPath.row-1].date)
+                }
                 
                 cell.team1Label.text = upcomingGames[indexPath.row-1].team1
                 cell.team1Label.adjustsFontSizeToFitWidth = true

@@ -36,12 +36,16 @@ class Game: NSObject, NSCoding  {
     let team2: String
     let date: String
     let game_id: String
+    let is_live: Int
+    let elapsed_time: String
     
-    init(team1: String, team2: String, date: String, game_id: String) {
+    init(team1: String, team2: String, date: String, game_id: String, is_live: Int = 0, elapsed_time: String = "0") {
         self.team1 = team1
         self.team2 = team2
         self.date = date
         self.game_id = game_id
+        self.is_live = is_live
+        self.elapsed_time = elapsed_time
     }
     
     required convenience init(coder aDecoder: NSCoder) {
@@ -49,7 +53,9 @@ class Game: NSObject, NSCoding  {
         let team2 = aDecoder.decodeObject(forKey: "team2") as! String
         let date = aDecoder.decodeObject(forKey: "date") as! String
         let game_id = aDecoder.decodeObject(forKey: "game_id") as! String
-        self.init(team1: team1, team2: team2, date: date, game_id: game_id)
+        let is_live = aDecoder.decodeInteger(forKey: "is_live")
+        let elapsed_time = aDecoder.decodeObject(forKey: "elapsed_time") as! String
+        self.init(team1: team1, team2: team2, date: date, game_id: game_id, is_live: is_live, elapsed_time: elapsed_time)
     }
     
     func encode(with aCoder: NSCoder) {
@@ -57,6 +63,8 @@ class Game: NSObject, NSCoding  {
         aCoder.encode(team2, forKey: "team2")
         aCoder.encode(date, forKey: "date")
         aCoder.encode(game_id, forKey: "game_id")
+        aCoder.encode(is_live, forKey: "is_live")
+        aCoder.encode(elapsed_time, forKey: "elapsed_time")
     }
 };
 

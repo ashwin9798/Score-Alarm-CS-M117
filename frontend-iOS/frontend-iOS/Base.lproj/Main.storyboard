@@ -527,7 +527,6 @@
         <image name="vertical-line.jpg" width="3" height="370"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ECy-FJ-YbJ"/>
         <segue reference="seG-oT-U4R"/>
     </inferredMetricsTieBreakers>
 </document>

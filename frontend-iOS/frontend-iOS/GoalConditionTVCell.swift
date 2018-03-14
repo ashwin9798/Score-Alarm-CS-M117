@@ -23,7 +23,7 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
     var cellIndex: Int = 0
     
     var picker1Val: Any = 0
-    var picker2Val: Int = 1
+    var picker2Val: Any = "N/A"
     
     var parentViewController: CreateAlarmViewController!
     
@@ -38,7 +38,7 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                 return 3
             }
             else {
-                return 90
+                return 91
             }
         }
         else {
@@ -46,7 +46,7 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                 return 10
             }
             else {
-                return 90
+                return 91
             }
         }
             
@@ -59,32 +59,66 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                     picker1Val = teamNames[row]
                 }
                 else {
-                    picker1Val = (row+1)
+                    picker1Val = (row)
                 }
             }
             else {
-                picker2Val = row+1
+                if(row == 0) {
+                    picker2Val = "N/A"
+                }
+                else {
+                    picker2Val = row
+                }
             }
             
             var templateString = ""
             if(cellIndex == 0) {
-                templateString = "Goal difference of \(picker1Val) at \(picker2Val) minutes"
-                parentViewController.myConditions[0] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 0, time_option: picker2Val, goal_option: picker1Val as! Int)
+                if let p2val = picker2Val as? String {
+                    templateString = "Goal difference of \(picker1Val)"
+                    parentViewController.myConditions[0] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 1, time_option: -1, goal_option: picker1Val as! Int)
+                }
+                else {
+                    templateString = "Goal difference of \(picker1Val) at \(picker2Val) minutes"
+                    parentViewController.myConditions[0] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 1, time_option: picker2Val as! Int, goal_option: picker1Val as! Int)
+                }
+                
             }
             else if(cellIndex == 1) {
-                templateString = "\(teamNames[0]) has scored at least \(picker1Val) after \(picker2Val) minutes"
-                 parentViewController.myConditions[1] = Condition(team: 0, game_id: parentViewController.game_id, condition_type: 1, time_option: picker2Val, goal_option: picker1Val as! Int)
+                if let p2val = picker2Val as? String {
+                    templateString = "\(teamNames[0]) has scored at least \(picker1Val) goals"
+                    parentViewController.myConditions[1] = Condition(team: 0, game_id: parentViewController.game_id, condition_type: 2, time_option: -1, goal_option: picker1Val as! Int)
+                }
+                else {
+                    templateString = "\(teamNames[0]) has scored at least \(picker1Val) after \(picker2Val) minutes"
+                    parentViewController.myConditions[1] = Condition(team: 0, game_id: parentViewController.game_id, condition_type: 2, time_option: picker2Val as! Int, goal_option: picker1Val as! Int)
+                }
             }
             else if(cellIndex == 2) {
-                templateString = "\(teamNames[1]) has scored at least \(picker1Val) after \(picker2Val) minutes"
-                parentViewController.myConditions[2] = Condition(team: 1, game_id: parentViewController.game_id, condition_type: 2, time_option: picker2Val, goal_option: picker1Val as! Int)
+                if let p2val = picker2Val as? String {
+                    templateString = "\(teamNames[1]) has scored at least \(picker1Val) goals"
+                    parentViewController.myConditions[2] = Condition(team: 1, game_id: parentViewController.game_id, condition_type: 2, time_option: -1, goal_option: picker1Val as! Int)
+                }
+                else {
+                    templateString = "\(teamNames[1]) has scored at least \(picker1Val) after \(picker2Val) minutes"
+                    parentViewController.myConditions[2] = Condition(team: 1, game_id: parentViewController.game_id, condition_type: 2, time_option: picker2Val as! Int, goal_option: picker1Val as! Int)
+                }
             }
             else if(cellIndex == 3) {
-                if(String(describing: picker1Val) == "Neither") {
-                    templateString = "The game is drawn at \(picker2Val) minutes"
+                if let p2val = picker2Val as? String {
+                    if(String(describing: picker1Val) == "Neither") {
+                        templateString = "The game is drawn"
+                    }
+                    templateString = "\(picker1Val) is leading"
+                    parentViewController.myConditions[3] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 3, time_option: -1, goal_option: -1)
                 }
-                templateString = "\(picker1Val) is leading at \(picker2Val) minutes"
-                parentViewController.myConditions[3] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 3, time_option: picker2Val, goal_option: -1)
+                else {
+                    if(String(describing: picker1Val) == "Neither") {
+                        templateString = "The game is drawn at \(picker2Val) minutes"
+                    }
+                    templateString = "\(picker1Val) is leading at \(picker2Val) minutes"
+                    parentViewController.myConditions[3] = Condition(team: -1, game_id: parentViewController.game_id, condition_type: 3, time_option: picker2Val as! Int, goal_option: -1)
+                }
+               
             }
             parentVC.chosenConditions[cellIndex] = templateString
             parentVC.updateLabel(index: cellIndex)
@@ -98,11 +132,11 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                 return teamNames[row]
             }
             else {
-                return String(row+1)
+                return String(row)
             }
         }
         else {
-            return String(row+1)
+            return String(row)
         }
     }
     
@@ -147,11 +181,26 @@ class GoalConditionTVCell: UITableViewCell, UIPickerViewDelegate, UIPickerViewDa
                 pickerLabel?.text = teamNames[row]
             }
             else {
-                pickerLabel?.text = String(row+1)
+                if(row == 0) {
+                    pickerLabel?.text = "N/A"
+                }
+                else {
+                    pickerLabel?.text = String(row)
+                }
             }
         }
         else {
-            pickerLabel?.text = String(row+1)
+            if(pickerView.tag == 0) {
+                pickerLabel?.text = String(row)
+            }
+            else {
+                if(row == 0) {
+                    pickerLabel?.text = "N/A"
+                }
+                else {
+                    pickerLabel?.text = String(row)
+                }
+            }
         }
         return pickerLabel!
     }
